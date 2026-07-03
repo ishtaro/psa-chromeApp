@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>PSA 返却予定日ヘルパー</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="psa-ext-popup">
+    <h1 class="psa-ext-popup__title">PSA 返却予定日ヘルパー</h1>
+
+    <label class="psa-ext-popup__toggle">
+      <span class="psa-ext-popup__toggle-label">拡張機能を有効化</span>
+      <span class="psa-ext-popup__switch">
+        <input type="checkbox" id="psa-ext-enabled" class="psa-ext-popup__checkbox">
+        <span class="psa-ext-popup__switch-slider" aria-hidden="true"></span>
+      </span>
+    </label>
+
+    <p class="psa-ext-popup__hint">
+      ON にすると PSA ご注文一覧ページに TAT と返却予定日を表示します。<br>
+      デフォルトは OFF です。
+    </p>
+
+    <a
+      href="https://www.psacard.com/ja-JP/myaccount/myorders"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="psa-ext-popup__link"
+    >
+      ご注文一覧ページを開く
+    </a>
+
+    <p class="psa-ext-popup__status" id="psa-ext-status" hidden></p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
