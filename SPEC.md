@@ -189,13 +189,14 @@ chrome-extension/
 
 **仕様:**
 
-- 拡張アイコンをクリックすると popup が開き、有効化トグル（チェックボックス）を表示する。
-- 状態は `chrome.storage.local` に `{ enabled: boolean }` で保存する。デフォルトは `true` (ON)、未設定も ON 扱い。
-- OFF に切り替えた瞬間:
+- 拡張アイコンをクリックすると popup が開き、有効化トグル（スイッチ）と myorders リンクを表示する。
+- 状態は `chrome.storage.local` に `{ enabled: boolean }` で保存する。**デフォルトは `false` (OFF) の opt-in 方式**。未設定も OFF 扱い。
+- 明示的に `enabled === true` が保存されたときのみ content script が起動する。それ以外（`undefined` / `false`）は何もしない。
+- OFF → ON の切替瞬間:
+  - `MutationObserver` を接続し、テーブルを再スキャンして表示を追加する。
+- ON → OFF の切替瞬間:
   - `MutationObserver` を切断する。
   - content script が追加した `<th class="psa-ext-*">` / `<td class="psa-ext-*">` を `psaExt.clearAll()` で全撤去する。
-- ON に切り替えた瞬間:
-  - observer を再接続し、テーブルを再スキャンして通常状態に復帰する。
 - ページリロード不要で即時反映する。
 
 **追加ファイル:**
@@ -219,3 +220,11 @@ chrome-extension/
                                                             enabled=true  → startExtension()
                                                             enabled=false → stopExtension() (clearAll + disconnect)
 ```
+
+**インストール直後の挙動:**
+
+1. ユーザーが拡張機能を Chrome Web Store からインストール
+2. myorders ページを開いても、拡張は自動起動しない（`enabled` 未設定 = OFF 扱い）
+3. ユーザーが拡張アイコンをクリック → popup が開く
+4. トグルを ON にする → その場で TAT / 返却予定日列が現れる
+5. 次回以降は `enabled: true` が保存されているので、myorders を開くたびに自動起動する

@@ -3,8 +3,8 @@
 
   const NO_DATA = "—";
   const STORAGE_KEY = "enabled";
-  // 未設定時は有効扱い。popup 側の DEFAULT_ENABLED と一致させる。
-  let enabled = true;
+  // 未設定時は無効扱い（opt-in）。popup 側の DEFAULT_ENABLED と一致させる。
+  let enabled = false;
 
   async function processRow(tr, holidaySet) {
     const data = psaExt.extractRow(tr);
@@ -98,8 +98,8 @@
   // popup 側で ON/OFF 切替時に即時反映する。
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local" || !(STORAGE_KEY in changes)) return;
-    // undefined はデフォルト (true) 扱いにする。
-    const next = changes[STORAGE_KEY].newValue !== false;
+    // 明示的に true が入ったときだけ有効化。undefined / false は無効。
+    const next = changes[STORAGE_KEY].newValue === true;
     if (next === enabled) return;
     enabled = next;
     if (enabled) startExtension();
@@ -107,7 +107,7 @@
   });
 
   chrome.storage.local.get(STORAGE_KEY, (result) => {
-    enabled = result[STORAGE_KEY] !== false;
+    enabled = result[STORAGE_KEY] === true;
     if (enabled) startExtension();
   });
 })();
