@@ -2,6 +2,9 @@
   "use strict";
 
   const NO_DATA = "—";
+  const STORAGE_KEY = "enabled";
+  // 未設定時は有効扱い。popup 側の DEFAULT_ENABLED と一致させる。
+  let enabled = true;
 
   async function processRow(tr, holidaySet) {
     const data = psaExt.extractRow(tr);
@@ -40,6 +43,7 @@
   }
 
   async function process() {
+    if (!enabled) return;
     const table = psaExt.findOrdersTable();
     if (!table) return;
     const holidaySet = await psaExt.getHolidaySet();
@@ -52,6 +56,7 @@
   // 短時間の連続 mutation をまとめて 1 回実行する。
   let scheduled = false;
   function schedule() {
+    if (!enabled) return;
     if (scheduled) return;
     scheduled = true;
     setTimeout(() => {
@@ -68,6 +73,7 @@
   // 監視範囲は「テーブルが載っているコンテナ」に絞る。
   // テーブル未発見時は body に広げ、SPA 再描画でテーブルが差し替わっても追従する。
   function reattachObserver() {
+    if (!enabled) return;
     const table = psaExt.findOrdersTable();
     const desired = table ? table.parentElement || table : document.body;
     if (desired === observedTarget && desired.isConnected) return;
@@ -76,6 +82,32 @@
     observedTarget = desired;
   }
 
-  reattachObserver();
-  schedule();
+  // 拡張を停止する: observer 切断 + 追加した DOM 要素を全撤去。
+  function stopExtension() {
+    observer.disconnect();
+    observedTarget = null;
+    if (typeof psaExt.clearAll === "function") psaExt.clearAll();
+  }
+
+  // 拡張を起動する: observer 接続 + 初回スキャン実行。
+  function startExtension() {
+    reattachObserver();
+    schedule();
+  }
+
+  // popup 側で ON/OFF 切替時に即時反映する。
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" || !(STORAGE_KEY in changes)) return;
+    // undefined はデフォルト (true) 扱いにする。
+    const next = changes[STORAGE_KEY].newValue !== false;
+    if (next === enabled) return;
+    enabled = next;
+    if (enabled) startExtension();
+    else stopExtension();
+  });
+
+  chrome.storage.local.get(STORAGE_KEY, (result) => {
+    enabled = result[STORAGE_KEY] !== false;
+    if (enabled) startExtension();
+  });
 })();

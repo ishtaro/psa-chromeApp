@@ -87,7 +87,23 @@
 - [ ] バージョン `0.1.0` タグ付け
 - [ ] `dist/psa-ext-0.1.0.zip` パッケージ生成
 
-## 将来拡張（MVP 後）
+## v0.2: 拡張機能 ON/OFF トグル
+
+SPEC.md §13.1 参照。v0.1 リリース後にマージ予定（現在 `feat/popup-onoff-toggle` ブランチで実装済み）。
+
+- [x] `src/popup/index.html` 作成（トグル UI）
+- [x] `src/popup/popup.css` 作成（`psa-ext-popup__*` プレフィックス）
+- [x] `src/popup/popup.js` 作成（`chrome.storage.local` 読み書き）
+- [x] `manifest.json` に `action.default_popup` を追加
+- [x] `src/content/index.js` に `enabled` 状態判定と `chrome.storage.onChanged` 購読を追加
+- [x] OFF 時に `psaExt.clearAll()` + observer 切断で追加要素を撤去
+- [x] ON 時に `reattachObserver()` + `schedule()` で復帰
+- [ ] 実機での動作確認（Chrome にビルド版を読み込んで ON/OFF が正常動作すること）
+- [ ] popup デザイン調整（実機確認後の見た目改善が必要なら）
+- [ ] `manifest.json` の `version` を `0.2.0` に更新
+- [ ] `develop` にマージ → `main` にリリース PR
+
+## 将来拡張（v0.2 以降）
 
 - [x] 祝日カレンダー対応（内閣府 CSV + ハードコードフォールバック）
 - [ ] PSA US（`/en-US/*`）対応

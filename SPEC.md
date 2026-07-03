@@ -159,12 +159,13 @@ chrome-extension/
 ├── SPEC.md / TASKS.md / CLAUDE.md / README.md
 ```
 
-## 10. スコープ外（MVP）
+## 10. スコープ外（MVP = v0.1.0）
 
 - PSA US（`/en-US/*`）対応
 - Firefox / Edge 対応
 - オプションページ（TAT 手動編集、表示位置調整）
 - 通知／リマインド機能
+- 拡張機能 ON/OFF トグル → **v0.2 で対応**（§13 参照）
 
 ## 11. 想定リスク
 
@@ -178,4 +179,43 @@ chrome-extension/
 - **PSA 到着日**: 対象カードが PSA に到着した日。myorders の「到着」列に表示される。
 - **返却予定日**: 鑑定完了後、PSA からユーザーへ返送される予定日。順算結果。
 - **現行プラン**: `/services` に掲載されている受付中のプラン。
-- **停止プラン**: 過去に受付していたが現在は新規受付停止のプラン（Value 系）。既存注文には残存する。
+- **停止プラン**: 過去に受付していたが現在は新規受付停止のプラン（Value 系、リホルダー系）。既存注文には残存する。
+
+## 13. v0.2 追加機能
+
+### 13.1 拡張機能 ON/OFF トグル
+
+現状（v0.1）は content script が myorders ページで常時起動する。v0.2 では拡張アイコンのポップアップから ON/OFF を切り替えられるようにする。
+
+**仕様:**
+
+- 拡張アイコンをクリックすると popup が開き、有効化トグル（チェックボックス）を表示する。
+- 状態は `chrome.storage.local` に `{ enabled: boolean }` で保存する。デフォルトは `true` (ON)、未設定も ON 扱い。
+- OFF に切り替えた瞬間:
+  - `MutationObserver` を切断する。
+  - content script が追加した `<th class="psa-ext-*">` / `<td class="psa-ext-*">` を `psaExt.clearAll()` で全撤去する。
+- ON に切り替えた瞬間:
+  - observer を再接続し、テーブルを再スキャンして通常状態に復帰する。
+- ページリロード不要で即時反映する。
+
+**追加ファイル:**
+
+| ファイル | 役割 |
+| --- | --- |
+| `src/popup/index.html` | popup の UI（トグル + 説明文） |
+| `src/popup/popup.css` | popup 用スタイル（`psa-ext-popup__*` プレフィックス） |
+| `src/popup/popup.js` | `chrome.storage.local` への読み書き |
+
+**既存ファイル変更:**
+
+- `manifest.json`: `action.default_popup` に `src/popup/index.html` を指定
+- `src/content/index.js`: `chrome.storage.local.get(STORAGE_KEY)` で初期状態取得、`chrome.storage.onChanged` で切替を購読、有効時のみ `schedule()` / `reattachObserver()` を実行
+
+**動作フロー:**
+
+```
+[popup] ─チェック変更→ chrome.storage.local.set({ enabled }) ─変更通知→ [content script]
+                                                                          ↓
+                                                            enabled=true  → startExtension()
+                                                            enabled=false → stopExtension() (clearAll + disconnect)
+```
