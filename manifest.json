@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PSA 返却予定日ヘルパー",
   "short_name": "PSA Return ETA",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "PSA ご注文一覧に、サービスレベルの TAT と PSA 到着日から順算した返却予定日を追記表示します。",
   "permissions": ["storage", "alarms"],
   "host_permissions": [
