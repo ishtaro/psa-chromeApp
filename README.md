@@ -1,2 +1,2 @@
-# psa-chromeApp
-PSA結果予定日を注文ページに追加するchromeの拡張機能
+# psa_subApp
+PSAページで使う拡張機能の開発

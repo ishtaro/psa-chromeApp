@@ -1,0 +1,41 @@
+/*
+ * PSA 拡張機能が挿入する要素の名前空間スタイル。
+ * 既存 UI との差を最小化するため、レイアウトはページの Tailwind クラスを利用しつつ
+ * ここでは色・強調のみを軽く整える。既存要素へは適用しない。
+ */
+
+.psa-ext-th,
+.psa-ext-tat-th {
+  font-weight: 600;
+}
+
+.psa-ext-td > p,
+.psa-ext-tat-td > p {
+  margin: 0;
+}
+
+.psa-ext-tat-td {
+  /* 行全体クリックで注文詳細に遷移する挙動が上乗せされているため、
+     プルダウン周りを前面に浮かせて操作を確実に受ける。 */
+  position: relative;
+  z-index: 10;
+  cursor: default;
+}
+
+.psa-ext-tat-select {
+  position: relative;
+  z-index: 11;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  min-width: 5rem;
+}
+
+.psa-ext-tat-select:focus {
+  outline: 2px solid rgba(0, 0, 0, 0.35);
+  outline-offset: 1px;
+}

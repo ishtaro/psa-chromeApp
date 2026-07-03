@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "PSA 返却予定日ヘルパー",
+  "short_name": "PSA Return ETA",
+  "version": "0.1.0",
+  "description": "PSA ご注文一覧に、サービスレベルの TAT と PSA 到着日から順算した返却予定日を追記表示します。",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://www.psacard.com/ja-JP/*",
+    "https://www8.cao.go.jp/*"
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "PSA 返却予定日ヘルパー",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.psacard.com/ja-JP/myaccount/myorders*"],
+      "js": [
+        "src/content/calculator.js",
+        "src/content/tat-store.js",
+        "src/content/holidays-store.js",
+        "src/content/extract.js",
+        "src/content/ui.js",
+        "src/content/index.js"
+      ],
+      "css": ["src/styles/overlay.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
