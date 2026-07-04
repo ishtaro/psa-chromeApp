@@ -6,18 +6,11 @@
   // 未設定時は無効扱い（opt-in）。popup 側の DEFAULT_ENABLED と一致させる。
   let enabled = false;
 
-  async function processRow(tr, holidaySet) {
-    const data = psaExt.extractRow(tr);
-    if (!data) {
-      psaExt.renderTatCell(tr, null, null);
-      psaExt.renderRow(tr, NO_DATA);
-      return;
-    }
-
+  async function processRow(tr, data, holidaySet) {
     const tatDays = await psaExt.getTatDays(data.orderId, data.serviceLevel);
     psaExt.renderTatCell(tr, data.orderId, tatDays);
 
-    if (tatDays == null) {
+    if (tatDays == null || !data.arrivalDate) {
       psaExt.renderRow(tr, NO_DATA);
       return;
     }
@@ -30,12 +23,19 @@
   }
 
   async function processTable(table, holidaySet) {
+    const rows = [...table.querySelectorAll("tbody tr")];
+    const extracted = rows.map((tr) => ({ tr, data: psaExt.extractRow(tr) }));
+
+    // 注文行が 1 つもない（空テーブル・「ご注文がありません」等のメッセージ行のみ）
+    // 場合はヘッダー列も追加せず、既存表示に一切手を付けない。
+    if (!extracted.some((e) => e.data)) return;
+
     psaExt.ensureTatHeaderColumn(table);
     if (!psaExt.ensureHeaderColumn(table)) return;
-    const rows = table.querySelectorAll("tbody tr");
-    for (const tr of rows) {
+    for (const { tr, data } of extracted) {
+      if (!data) continue; // 注文行の形をしていない行はスキップ
       try {
-        await processRow(tr, holidaySet);
+        await processRow(tr, data, holidaySet);
       } catch (err) {
         console.warn("[psa-ext] row render failed", err);
       }
