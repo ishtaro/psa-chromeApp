@@ -7,11 +7,15 @@ const DEFAULT_ENABLED = false;
 const checkbox = document.getElementById("psa-ext-enabled");
 const status = document.getElementById("psa-ext-status");
 
+let statusTimer = null;
+
 function showStatus(text) {
   if (!status) return;
   status.textContent = text;
   status.hidden = false;
-  setTimeout(() => {
+  // 連続切替時に前のタイマーが新しい表示を消さないようリセットする。
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
     status.hidden = true;
   }, 1500);
 }
