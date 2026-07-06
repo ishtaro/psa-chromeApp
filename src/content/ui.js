@@ -8,7 +8,7 @@ const SELECT_CLASS = "psa-ext-tat-select";
 const ROUNDED_TR = "rounded-tr-2xl";
 
 // 手入力を許可する営業日候補。
-const TAT_OPTIONS = [10, 15, 20, 25, 30, 40, 45, 60, 75, 90, 120, 150];
+const TAT_OPTIONS = [10, 15, 20, 25, 30, 40, 45, 60, 75, 90, 120, 150, 160];
 
 // テーブルヘッダーに「返却予定日」列を 1 度だけ追加する。
 // 既存の最後の <th> が持つ右上角丸クラスを新規列に移して、見た目を維持する。
