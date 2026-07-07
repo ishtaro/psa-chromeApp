@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh pr *)",
+      "Bash(gh pr create --base main --head develop --title 'release: 停止プラン辞書拡充を含む v0.1.0 準備' --body ' *)",
+      "Bash(git commit -m ' *)",
+      "Bash(gh pr create --base develop --head feat/popup-onoff-toggle --title 'feat: 拡張機能 ON/OFF トグル \\(opt-in\\) を追加 \\(v0.2.0\\)' --body ' *)",
+      "Bash(python3 -)",
+      "Bash(gh pr create --base develop --head fix/dictionary-sync-and-fail-safe --title 'fix: content 側 TAT 辞書の同期漏れ修正とフェイルセーフ強化' --body ' *)"
+    ]
+  }
+}

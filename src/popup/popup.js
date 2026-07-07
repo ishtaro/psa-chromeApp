@@ -2,7 +2,8 @@
 // content script 側は storage 変更を購読して即時に有効/無効化する。
 
 const STORAGE_KEY = "enabled";
-const DEFAULT_ENABLED = false;
+// デフォルト ON（opt-out）。未設定時はトグルを ON 表示にする。
+const DEFAULT_ENABLED = true;
 
 const checkbox = document.getElementById("psa-ext-enabled");
 const status = document.getElementById("psa-ext-status");

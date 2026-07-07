@@ -9,6 +9,30 @@
   font-weight: 600;
 }
 
+/*
+ * 拡張列を追加するとテーブルの最小幅が枠（角丸ボーダー）を超え、
+ * ボーダーが本文を突き抜けて崩れる。枠側を横スクロールにして内側へ収める。
+ * テーブルが枠内に収まる幅ではスクロールは出ず、既存の見た目に影響しない。
+ */
+.psa-ext-scroll-x {
+  overflow-x: auto;
+}
+
+/*
+ * overflow-x を指定すると CSS 仕様上 overflow-y も visible → auto に計算され、
+ * 枠がスクロールコンテナ化する。この枠には元々 table-header-sticky が付いており、
+ * sticky ヘッダーの基準がページからこの枠へ移るため、スクロール時にヘッダーが
+ * 本文へ重なって崩れる。横スクロールと sticky は構造上両立しないため、
+ * スクロール枠内では sticky を解除して通常フローへ戻す（重なりを防ぐ）。
+ * sticky は thead ではなく th(セル)側に付与されているため th を対象にする。
+ * !important は site 側 .table-header-sticky との適用順が保証されないため付与。
+ */
+.psa-ext-scroll-x thead,
+.psa-ext-scroll-x thead tr,
+.psa-ext-scroll-x thead th {
+  position: static !important;
+}
+
 .psa-ext-td > p,
 .psa-ext-tat-td > p {
   margin: 0;
