@@ -3,7 +3,8 @@
 
   const NO_DATA = "—";
   const STORAGE_KEY = "enabled";
-  // 未設定時は無効扱い（opt-in）。popup 側の DEFAULT_ENABLED と一致させる。
+  // 未設定時は有効扱い（デフォルト ON / opt-out）。popup 側の DEFAULT_ENABLED と一致させる。
+  // 初期値は false にしておき、storage 読み込み後に実際の状態を反映する（未確定中は何もしない）。
   let enabled = false;
 
   async function processRow(tr, data, holidaySet) {
@@ -32,6 +33,7 @@
 
     psaExt.ensureTatHeaderColumn(table);
     if (!psaExt.ensureHeaderColumn(table)) return;
+    psaExt.ensureScrollContainer(table);
     for (const { tr, data } of extracted) {
       if (!data) continue; // 注文行の形をしていない行はスキップ
       try {
@@ -40,6 +42,8 @@
         console.warn("[psa-ext] row render failed", err);
       }
     }
+    // 全セル描画後の実幅ではみ出しを判定してスクロールヒントを出す。
+    psaExt.ensureScrollHint(table);
   }
 
   async function process() {
@@ -98,8 +102,8 @@
   // popup 側で ON/OFF 切替時に即時反映する。
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== "local" || !(STORAGE_KEY in changes)) return;
-    // 明示的に true が入ったときだけ有効化。undefined / false は無効。
-    const next = changes[STORAGE_KEY].newValue === true;
+    // 明示的に false のときだけ無効化。true / 未設定はデフォルト ON。
+    const next = changes[STORAGE_KEY].newValue !== false;
     if (next === enabled) return;
     enabled = next;
     if (enabled) startExtension();
@@ -107,7 +111,7 @@
   });
 
   chrome.storage.local.get(STORAGE_KEY, (result) => {
-    enabled = result[STORAGE_KEY] === true;
+    enabled = result[STORAGE_KEY] !== false;
     if (enabled) startExtension();
   });
 })();
