@@ -29,18 +29,27 @@ psaExt.formatDateKey = function (date) {
   return `${y}-${m}-${d}`;
 };
 
-// 土日と祝日 (holidaySet) を除いた営業日を加算する。
-// holidaySet 省略時は土日のみ除外。
+// 到着日（当日）を 1 営業日目として数え、days 営業日目に当たる日を返す（当日含む）。
+// 当日が土日祝の場合は、それ以降の最初の営業日が 1 日目になる。
+// 土日と祝日 (holidaySet) を除外。holidaySet 省略時は土日のみ除外。
 psaExt.addBusinessDays = function (date, days, holidaySet) {
   const holidays = holidaySet || new Set();
   const d = new Date(date.getTime());
-  let added = 0;
-  while (added < days) {
+  if (days <= 0) return d;
+
+  const isBusinessDay = (x) => {
+    const dow = x.getDay();
+    return dow !== 0 && dow !== 6 && !holidays.has(psaExt.formatDateKey(x));
+  };
+
+  let count = 0;
+  // 当日から数え始め、days 営業日目に到達したその日を返す。
+  while (true) {
+    if (isBusinessDay(d)) {
+      count++;
+      if (count >= days) break;
+    }
     d.setDate(d.getDate() + 1);
-    const dow = d.getDay();
-    if (dow === 0 || dow === 6) continue;
-    if (holidays.has(psaExt.formatDateKey(d))) continue;
-    added++;
   }
   return d;
 };
